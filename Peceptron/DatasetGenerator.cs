@@ -52,10 +52,8 @@ namespace Peceptron
                 var fontFamily = fontFamilies[_random.Next(fontFamilies.Length)];
                 var fontSize = (float)(_random.Next((int)(imageSize * (1 - 2 * borderOffset) - 12)) + 10);
                 var fontRotate = _random.Next(2 * rotationAngle + 1) - rotationAngle;
-                var xOffset = _random.Next(Math.Abs((int)((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * xCorrection)));
-                xOffset = xOffset < 0 ? 0: xOffset;
-                var yOffset = _random.Next(Math.Abs((int)((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * yCorrection)));
-                yOffset = yOffset < 0 ? 0: yOffset;
+                var xOffset = ((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * xCorrection) < 0? 0 : _random.Next((int)((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * xCorrection));
+                var yOffset = ((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * yCorrection) < 0? 0 : _random.Next((int)((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * yCorrection));
                 g.RotateTransform(fontRotate);
                 g.DrawString(
                     drawnSymbol,
