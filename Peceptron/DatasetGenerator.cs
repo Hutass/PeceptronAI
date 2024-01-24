@@ -36,35 +36,40 @@ namespace Peceptron
         /// <param name="fontFamilies">Используемые для генерации семейства шрифтов</param>
         public void CreateSymbol(string drawnSymbol, int datasetSize, int imageSize, int rotationAngle = 0, double borderOffset = 0.05, double xCorrection = 0.0, double yCorrection = 0.0, string[] fontFamilies = null)
         {
-            fontFamilies = fontFamilies ?? FontFamilies;
-            string symbolPath = _directoryPath + @"\" + drawnSymbol;
-            Directory.CreateDirectory(symbolPath);
-            var encoderParameters = new EncoderParameters(1);
-            encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 1L);
-            //var fonts = typeof(Fonts).GetEnumValues();
-
-            for (int i = 0; i < datasetSize; i++)
+            try
             {
-                Bitmap image = new(imageSize, imageSize);
+                fontFamilies = fontFamilies ?? FontFamilies;
+                string symbolPath = _directoryPath + @"\" + drawnSymbol;
+                Directory.CreateDirectory(symbolPath);
+                var encoderParameters = new EncoderParameters(1);
+                encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 1L);
+                //var fonts = typeof(Fonts).GetEnumValues();
 
-                Graphics g = Graphics.FromImage(image);
-                g.FillRectangle(System.Drawing.Brushes.White, 0, 0, imageSize, imageSize);
-                var fontFamily = fontFamilies[_random.Next(fontFamilies.Length)];
-                var fontSize = (float)(_random.Next((int)(imageSize * (1 - 2 * borderOffset) - 12)) + 10);
-                var fontRotate = _random.Next(2 * rotationAngle + 1) - rotationAngle;
-                var xOffset = ((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * xCorrection) < 0? 0 : _random.Next((int)((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * xCorrection));
-                var yOffset = ((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * yCorrection) < 0? 0 : _random.Next((int)((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * yCorrection));
-                g.RotateTransform(fontRotate);
-                g.DrawString(
-                    drawnSymbol,
-                    new Font(fontFamily, fontSize, GraphicsUnit.Pixel),
-                    System.Drawing.Brushes.Black,
-                    (float)(imageSize * borderOffset + fontSize * xCorrection + xOffset),
-                    (float)(imageSize * borderOffset + fontSize * yCorrection + yOffset)
-                    );
+                for (int i = 0; i < datasetSize; i++)
+                {
+                    Bitmap image = new(imageSize, imageSize);
 
-                image.Save(symbolPath + @"\" + $"{i:D5}" + ".png", GetEncoder(ImageFormat.Png), encoderParameters);
+                    Graphics g = Graphics.FromImage(image);
+                    g.FillRectangle(System.Drawing.Brushes.White, 0, 0, imageSize, imageSize);
+                    var fontFamily = fontFamilies[_random.Next(fontFamilies.Length)];
+                    var fontSize = (float)(_random.Next((int)(imageSize * (1 - 2 * borderOffset) - 12)) + 10);
+                    var fontRotate = _random.Next(2 * rotationAngle + 1) - rotationAngle;
+                    var xOffset = ((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * xCorrection) < 0 ? 0 : _random.Next((int)((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * xCorrection));
+                    var yOffset = ((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * yCorrection) < 0 ? 0 : _random.Next((int)((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * yCorrection));
+                    g.RotateTransform(fontRotate);
+                    g.DrawString(
+                        drawnSymbol,
+                        new Font(fontFamily, fontSize, GraphicsUnit.Pixel),
+                        System.Drawing.Brushes.Black,
+                        (float)(imageSize * borderOffset + fontSize * xCorrection + xOffset),
+                        (float)(imageSize * borderOffset + fontSize * yCorrection + yOffset)
+                        );
+
+                    image.Save(symbolPath + @"\" + $"{i:D5}" + ".png", GetEncoder(ImageFormat.Png), encoderParameters);
+                }
+
             }
+            catch { Exception ex; }
         }
 
         private static ImageCodecInfo GetEncoder(ImageFormat format)
