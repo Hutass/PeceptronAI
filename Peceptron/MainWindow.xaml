@@ -7,6 +7,10 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-
+        <StackPanel>
+            <Button Content="Сгенерировать датасет (500 каждого типа)" Click="Button_Click"/>
+            <Button Content="Обучить (10000 шагов)" Click="Button_Click_1"/>
+            <Button Content="Проверить" Click="Button_Click_2"/>
+        </StackPanel>
     </Grid>
 </Window>

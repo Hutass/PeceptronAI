@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peceptron", "Peceptron\Peceptron.csproj", "{100571EB-5EFA-40A9-AFF3-374ECFB53055}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Perceptron", "Peceptron\Perceptron.csproj", "{100571EB-5EFA-40A9-AFF3-374ECFB53055}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

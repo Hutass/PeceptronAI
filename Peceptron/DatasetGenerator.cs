@@ -20,7 +20,7 @@ namespace Peceptron
         public DatasetGenerator(string directoryPath)
         {
             if (!Directory.Exists(directoryPath))
-                throw new FileNotFoundException(nameof(directoryPath), "Saving path is not exist!!");
+                throw new FileNotFoundException(nameof(directoryPath), "Путь к директории указан неверно!!");
             _directoryPath = directoryPath;
         }
         /// <summary>
@@ -29,21 +29,26 @@ namespace Peceptron
         /// <param name="drawnSymbol">Рисуемый символ</param>
         /// <param name="datasetSize">Число сгенерированных изображений</param>
         /// <param name="imageSize">Размер изображения</param>
+        /// <param name="minSizeInPixels">Минимальный размер символа в пикселях</param>
         /// <param name="rotationAngle">Угол поворота текста</param>
         /// <param name="xCorrection">Смещение по x (отрицательное подвинет знак вверх), может понадобиться для символов в строчном наборе</param>
         /// <param name="yCorrection">Смещение по x (отрицательное подвинет знак вверх), может понадобиться для символов в строчном наборе</param>
+        /// <param name="fontSizeCorrection">Множитель размера шрифта</param>
         /// <param name="borderOffset">Отступ от границы изображения в процентах</param>
         /// <param name="fontFamilies">Используемые для генерации семейства шрифтов</param>
-        public void CreateSymbol(string drawnSymbol, int datasetSize, int imageSize, int rotationAngle = 0, double borderOffset = 0.05, double xCorrection = 0.0, double yCorrection = 0.0, string[] fontFamilies = null)
+        public void CreateSymbol(string drawnSymbol, int datasetSize, int imageSize, int minSizeInPixels, int rotationAngle = 0, int repeats = 1, double borderOffset = 0.05, double xCorrection = 0.0, double yCorrection = 0.0, double fontSizeCorrection = 1, string[] fontFamilies = null)
         {
             try
             {
                 fontFamilies = fontFamilies ?? FontFamilies;
-                string symbolPath = _directoryPath + @"\" + drawnSymbol;
-                Directory.CreateDirectory(symbolPath);
+                string symbolPath = _directoryPath + @"\" + drawnSymbol + "_" + ((byte)drawnSymbol[0]) + "_" + repeats;
+                if(!Directory.Exists(symbolPath))
+                    Directory.CreateDirectory(symbolPath);
+                int lastFile = 0;
+                if (Directory.GetFiles(symbolPath).Length > 0)
+                    lastFile = Convert.ToInt32(Path.GetFileNameWithoutExtension(Directory.GetFiles(symbolPath)?.Last()));
                 var encoderParameters = new EncoderParameters(1);
                 encoderParameters.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Quality, 1L);
-                //var fonts = typeof(Fonts).GetEnumValues();
 
                 for (int i = 0; i < datasetSize; i++)
                 {
@@ -52,20 +57,20 @@ namespace Peceptron
                     Graphics g = Graphics.FromImage(image);
                     g.FillRectangle(System.Drawing.Brushes.White, 0, 0, imageSize, imageSize);
                     var fontFamily = fontFamilies[_random.Next(fontFamilies.Length)];
-                    var fontSize = (float)(_random.Next((int)(imageSize * (1 - 2 * borderOffset) - 12)) + 10);
+                    var fontSize = (float)(_random.Next((int)(imageSize * (1 - 2 * borderOffset) - minSizeInPixels)) + minSizeInPixels);
                     var fontRotate = _random.Next(2 * rotationAngle + 1) - rotationAngle;
                     var xOffset = ((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * xCorrection) < 0 ? 0 : _random.Next((int)((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * xCorrection));
                     var yOffset = ((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * yCorrection) < 0 ? 0 : _random.Next((int)((1 - 2 * borderOffset) * imageSize - fontSize - fontSize * yCorrection));
                     g.RotateTransform(fontRotate);
                     g.DrawString(
                         drawnSymbol,
-                        new Font(fontFamily, fontSize, GraphicsUnit.Pixel),
+                        new Font(fontFamily, (int)(fontSize * fontSizeCorrection), GraphicsUnit.Pixel),
                         System.Drawing.Brushes.Black,
                         (float)(imageSize * borderOffset + fontSize * xCorrection + xOffset),
                         (float)(imageSize * borderOffset + fontSize * yCorrection + yOffset)
                         );
 
-                    image.Save(symbolPath + @"\" + $"{i:D5}" + ".png", GetEncoder(ImageFormat.Png), encoderParameters);
+                    image.Save(symbolPath + @"\" + $"{(lastFile + i + 1):D5}.png", GetEncoder(ImageFormat.Png), encoderParameters);
                 }
 
             }
